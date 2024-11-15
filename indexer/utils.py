@@ -1,33 +1,36 @@
 from collections.abc import Iterator
 import json
+import pickle
 from bs4 import BeautifulSoup
 import re
 from .types import inverted_index
+from nltk.stem import PorterStemmer
 
-def save_index_json(dir_path: str, name: str, index: inverted_index):
-    with open(f"{dir_path}/{name}.json", 'w') as index_json:
-        json.dump(index, index_json)
+def save(dir_path: str, name: str, struct: dict|list):
+    with open(f"{dir_path}/{name}.bin", 'wb') as target:
+        pickle.dump(struct, target)
 
 def parse_html(html: str):
     '''returns raw textual content parsed from given html'''
     soup = BeautifulSoup(html, 'html.parser')
-    raw_text = soup.get_text(separator=" ", strip=True).lower()
+    raw_text = soup.get_text(separator=" ", strip=True)
     return raw_text 
 
-def parse_file_content(path: str) -> str:
+def parse_file(path: str) -> dict[str,str]:
     '''extracts html content from file'''
     with open(path, 'r') as file:
-        return json.load(file)['content']
+        return json.load(file)
 
-def tokenize(text: str) -> Iterator[str]:
+def tokenize(text: str, stem=True) -> Iterator[str]:
     '''return a stream of tokens from file at given path'''
-    alnum_text = re.sub(r"[^a-z0-9\s]", "", text)
+    alnum_text = re.sub(r"[^a-z0-9\s]", "", text.lower())
     for token in alnum_text.split():
-        token = stem(token)
+        token = stem_word(token) if stem else token
         if token == "":
             continue
         yield token
 
-def stem(word: str) -> str:
+porter = PorterStemmer()
+def stem_word(word: str) -> str:
     '''return stem for given word'''
-    return word
+    return porter.stem(word)
