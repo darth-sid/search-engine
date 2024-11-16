@@ -1,11 +1,33 @@
 from collections.abc import Iterator
-from .utils import parse_html, parse_file, tokenize, save
-from .types import inverted_index
+from .utils import parse_html, parse_file, tokenize, save_as_binary
+from .custom_types import inverted_index
 import os
-from .linkedlist import SortedLinkedList
+from indexer.utils import PartialIndexBuffer
 
 def build_partials(src_path: str, index_path: str, partials_path: str, part_threshold: int):
-    index = {}
+    id_path = f"{index_path}/id_ref"
+    os.mkdir(id_path)
+    index_buf = PartialIndexBuffer(partials_path, id_path)
+    partition_count = 0
+    for domain in os.scandir(src_path):
+        if not domain.is_dir():
+            continue
+        domain_path = f"{src_path}/{domain.name}"
+        print(domain.name)
+
+        for page in os.scandir(domain_path):
+            if not page.is_file():
+                continue
+            file_path = f"{domain_path}/{page.name}"
+            
+            index_buf.index_page(file_path)
+            if len(index_buf) == part_threshold:
+                index_buf.flush(str(partition_count), str(partition_count))
+                partition_count += 1
+    if index_buf:
+        index_buf.flush(str(partition_count), str(partition_count))
+            
+'''    index = {}
     ref = []
     doc_id = 0
     partition_id = 0
@@ -34,17 +56,21 @@ def build_partials(src_path: str, index_path: str, partials_path: str, part_thre
                 ref = []
                 partition_id += 1
     if index:
-        save(partials_path, f"partition_{partition_id}", index)
-    save(partials_path, "id_ref", ref)
-
+        for term in index:
+            index[term] = list(index[term])
+        save(partials_path, str(partition_id), index)
+    if ref:
+        save(partials_path, str(partition_id), ref)
+'''
 
 def merge_partials(index_path: str, partials_path: str) -> None:
     for path in os.scandir(partials_path):
-        pass
+        pass #TODO: pull term merge all postings and repeat
 
-def index_page(index: inverted_index, path: str, doc_id: int) -> str:
-    '''parse file at given path and update given inverted index'''
+'''def index_page(index: inverted_index, path: str, doc_id: int) -> str:
+    ''parse file at given path and update given inverted index''
     data = parse_file(path)
+    #print(data["encoding"])
     text = parse_html(data["content"])
     for word,tf in compute_word_tf(tokenize(text)).items():
         posting = (tf, doc_id)
@@ -53,15 +79,4 @@ def index_page(index: inverted_index, path: str, doc_id: int) -> str:
         index[word].insert(posting)
     return data["url"]
 
-def compute_word_tf(tokens: Iterator[str]) -> dict[str,float]:
-    '''return a map of tokens to their tf score (freq of token / total num of words)'''
-    frequencies = {}
-    total_words = 0
-    for token in tokens:
-        if token not in frequencies:
-            frequencies[token] = 0
-        frequencies[token] += 1
-        total_words += 1
-    for word in frequencies:
-        frequencies[word] = frequencies[word] / total_words
-    return frequencies
+'''

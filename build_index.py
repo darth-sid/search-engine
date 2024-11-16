@@ -3,6 +3,7 @@ from indexer import build_partials, merge_partials
 
 def build_index(src_path: str="CORPUS", index_path: str="INDEX", partials_path: str="PARTIAL_INDEXES", part_threshold: int=1000):
     os.mkdir(partials_path)
+    os.mkdir(index_path)
 
     build_partials(src_path, index_path, partials_path, part_threshold)
     
