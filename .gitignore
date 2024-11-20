@@ -165,3 +165,5 @@ CORPUS/
 *PARTIAL_INDEXES/
 INDEX/
 .DS_Store
+archive/
+ignore/
