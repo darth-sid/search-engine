@@ -167,3 +167,6 @@ INDEX/
 .DS_Store
 archive/
 ignore/
+report.*
+test.*
+out.txt
