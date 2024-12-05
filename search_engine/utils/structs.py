@@ -5,6 +5,7 @@ class Posting(Struct):
     tf: float
 
 class TermData(Struct):
+    important_postings: list[Posting]
     postings: list[Posting]
     idf: float
 

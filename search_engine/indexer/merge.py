@@ -27,13 +27,13 @@ def merge_partials(partials_path: str, path: str) -> None:
     with open(f"{path}/index.bin", "wb") as index:
         pos = 0
         while partials:
-            term,postings,_ = partials.pop()
+            term,_,postings = partials.pop()
             while partials and partials.peek().term == term:
                 entry = partials.pop()
                 postings.extend(entry.postings)
             df = len(postings)
             idf = log(N/df)
-            data = TermData(postings=postings, idf=idf)
+            data = TermData(postings=postings, important_postings=None, idf=idf)
             size = write_bin(index, data, pos=pos)
             frag = term[:2]
             if frag not in offsets:
@@ -75,11 +75,12 @@ class PartialIndexReadBuffer:
         return val
 
 class MultiPartialReader:
+    '''reads terms and their data from multiple open partial indexes'''
 
     class Entry(NamedTuple):
         term: str
-        postings: list[tuple]
         src_id: int
+        postings: list[Posting]
 
     def __init__(self, partials: list[PartialIndexReadBuffer]):
         self._heap = []
@@ -88,23 +89,25 @@ class MultiPartialReader:
             if (tup:=partial.read_next()) is None:
                 continue
             term, postings = tup
-            heapq.heappush(self._heap, MultiPartialReader.Entry(term, postings, partial.id))
+            heapq.heappush(self._heap, MultiPartialReader.Entry(term=term,
+                                                                src_id=partial.id,
+                                                                postings=postings))
         print(self._partials)
 
     def __len__(self):
         return len(self._heap)
 
     def pop(self) -> Entry:
-        '''pop term-postings pair from heap and try to repopulate with a 
-        term-postings pair from same partial index'''
+        '''pop term and its data from heap and try to repopulate with a 
+        term-data pair from same partial index'''
         entry = heapq.heappop(self._heap)
         if (tup:=self._partials[entry.src_id].read_next()) is not None:
             term,postings = tup
-            heapq.heappush(self._heap, MultiPartialReader.Entry(term, postings, entry.src_id))
+            heapq.heappush(self._heap, MultiPartialReader.Entry(term=term,
+                                                                src_id=entry.src_id,
+                                                                postings=postings))
         return entry
 
     def peek(self) -> Entry:
+        '''see next term-data pair to be popped'''
         return self._heap[0]
-
-
-
