@@ -20,23 +20,32 @@ def write_bin(file: BinaryIO, data: Collection, pos: int|None=None, delimited: b
     file.write(serialized)
     return len(serialized)
 
-def read_bin(file: BinaryIO) -> Any:
+def read_bin(file: BinaryIO, *, format: type[msgspec.Struct]|None=None) -> Any:
     chunk = file.read()
-    return msgspec.msgpack.decode(chunk)
+    return decode(chunk, format=format)
 
-def read_bin_chunk(file: BinaryIO, pos: int=0) -> tuple[Any,int]:
+def read_bin_chunk(file: BinaryIO, pos: int=0, *,
+                   format: type[msgspec.Struct]|None=None) -> tuple[Any,int]:
     file.seek(pos)
     size = struct.unpack("<I", file.read(4))[0]
     chunk = file.read(size)
-    return msgspec.msgpack.decode(chunk), size+4
+    return decode(chunk, format=format), size+4
 
-def read_bin_sized(file: BinaryIO, pos: int=0, size: int=-1) -> Any:
+def read_bin_sized(file: BinaryIO, pos: int=0, size: int=-1, *,
+                   format: type[msgspec.Struct]|None=None) -> Any:
     file.seek(pos)
     if size < 0:
         chunk = file.read()
     else:
         chunk = file.read(size)
-    return msgspec.msgpack.decode(chunk)
+    return decode(chunk, format=format)
+
+def decode(encoded: bytes, *, 
+           format: type[msgspec.Struct]|None=None) -> Any:
+    if format is None:
+        return msgspec.msgpack.decode(encoded)
+    else:
+        return msgspec.msgpack.decode(encoded, type=format)
 
 def read_json(path: str) -> dict[str,str]:
    '''extracts html content from file'''

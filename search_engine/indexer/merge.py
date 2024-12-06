@@ -33,7 +33,7 @@ def merge_partials(partials_path: str, path: str) -> None:
                 postings.extend(entry.postings)
             df = len(postings)
             idf = log(N/df)
-            data = TermData(postings=postings, important_postings=None, idf=idf)
+            data = TermData(postings=postings, important_postings=[], idf=idf)
             size = write_bin(index, data, pos=pos)
             frag = term[:2]
             if frag not in offsets:

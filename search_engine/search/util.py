@@ -15,7 +15,7 @@ def search_term(term: str) -> TermData|None:
             return None
         pos,size = table[term]
     with open("./INDEX/index.bin", "rb") as file:
-        return read_bin_sized(file, pos, size)
+        return read_bin_sized(file, pos, size, format=TermData)
 
 def retrieve(query: str, n: int, timed=False) -> list|tuple[list,float]:
     start = time.time()
@@ -23,19 +23,21 @@ def retrieve(query: str, n: int, timed=False) -> list|tuple[list,float]:
     q_terms = tokenize(query)
 
     results = {}
-    first = True
     for term in q_terms:
-        postings = search_term(term)
-        if postings is None:
-            continue
-        temp_results = {}
-        for score,doc_id in postings:
-            if first:
-                temp_results[doc_id] = -1*score
-            elif doc_id in results:
-                temp_results[doc_id] = results[doc_id]-score
-        results = temp_results
-        first = False
+        data = search_term(term)
+        if data is not None:
+            postings = data.postings
+            temp_results = {}
+            for posting in postings:
+                doc_id = posting.doc_id
+                score = posting.tf * data.idf
+                if doc_id == 18557:
+                    print(term, posting.tf, data.idf)
+                if not results:
+                    temp_results[doc_id] = -1*score
+                elif doc_id in results:
+                    temp_results[doc_id] = results[doc_id]-score
+            results = temp_results
 
     results_heap = []
     for doc_id in results:
