@@ -22,21 +22,18 @@ def retrieve(query: str, n: int, timed=False) -> list|tuple[list,float]:
 
     q_terms = tokenize(query)
 
+    # find documents containing all query terms
     results = {}
     for term in q_terms:
-        data = search_term(term)
-        if data is not None:
+        if (data:=search_term(term)) is not None:
             postings = data.postings
             temp_results = {}
             for posting in postings:
                 doc_id = posting.doc_id
                 score = posting.tf * data.idf
-                if doc_id == 18557:
-                    print(term, posting.tf, data.idf)
-                if not results:
-                    temp_results[doc_id] = -1*score
-                elif doc_id in results:
-                    temp_results[doc_id] = results[doc_id]-score
+                if not results or doc_id in results:
+                    curr_score = results[doc_id] if doc_id in results else 0
+                    temp_results[doc_id] = curr_score - score
             results = temp_results
 
     results_heap = []
@@ -46,12 +43,12 @@ def retrieve(query: str, n: int, timed=False) -> list|tuple[list,float]:
 
     out = []
     with open("./INDEX/ids.bin", "rb") as file:
-        table = read_bin(file)
+        urls = read_bin(file)
         for _ in range(n):
             if not results_heap:
                 break
             _, doc_id = heapq.heappop(results_heap)
-            out.append(table[doc_id])
+            out.append(urls[doc_id])
 
     end = time.time()
     if timed:
