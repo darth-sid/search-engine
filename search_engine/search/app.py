@@ -6,7 +6,8 @@ import sys
 app = Flask(__name__)
 c = CORS(app)
 
-@app.route('/search', methods=["GET"])
+
+@app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query")
     n = request.args.get("n")
@@ -15,7 +16,8 @@ def search():
     if n is None:
         n = 5
     urls = retrieve(query, 5, timed=True)
-    return {"time":urls[1],"urls":urls[0]}, 200
+    return {"time": urls[1], "urls": urls[0]}, 200
+
 
 if __name__ == "__main__":
     try:

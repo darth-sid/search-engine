@@ -1,10 +1,11 @@
 from utils import create_empty_dir, walk
 from utils.io import read_json, write_bin
-from utils.parse import parse_html, parse_xml, tokenize
+from utils.parse import tokenize_page
 from .simhashing import shingle, simhash, hamming_distance
 
+
 def preprocess(src_path: str, path: str):
-    '''preprocess corpus from src_path for indexing and save to given path'''
+    """preprocess corpus from src_path for indexing and save to given path"""
     create_empty_dir(path)
 
     hashes = []
@@ -13,9 +14,10 @@ def preprocess(src_path: str, path: str):
     for file_path in walk(src_path, file_ext="json"):
         data = read_json(file_path)
         content = data["content"]
-        text = parse_xml(content) if content.lstrip().startswith("<?xml") else parse_html(content)
-        tokens = list(tokenize(text))
-        shingles = shingle(tokens, 2)
+        tokens = list(
+            tokenize_page(content, ["title", "h1", "h2", "h3", "strong", "b"])
+        )
+        shingles = shingle(list(token for token, _ in tokens), 2)
         h = simhash(shingles)
         total_count += 1
         for h2 in hashes:
@@ -29,4 +31,6 @@ def preprocess(src_path: str, path: str):
                 page = {"url": data["url"], "tokens": tokens}
                 write_bin(file, page)
         if total_count % 1000 == 0:
-            print(f"{total_count} seen, {unique_count} unique, {total_count-unique_count} deduplicated")
+            print(
+                f"{total_count} seen, {unique_count} unique, {total_count-unique_count} deduplicated"
+            )
