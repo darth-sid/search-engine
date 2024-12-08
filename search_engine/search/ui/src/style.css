@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  overflow: hidden;
 }
 
 a {
@@ -60,8 +62,7 @@ button:focus-visible {
 
 #app {
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  margin: 0 10vw;
   text-align: center;
 }
 

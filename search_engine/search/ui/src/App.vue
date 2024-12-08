@@ -6,9 +6,8 @@ const results = ref(["Hello"])
 </script>
 
 <template>
-    <h1> Search :D </h1>
     <SearchBar :results=results />
-    </template>
+</template>
 
 <style scoped>
 .logo {
