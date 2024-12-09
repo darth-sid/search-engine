@@ -14,8 +14,7 @@ def search_term(term: str) -> list[Posting]:
     with open("INDEX/offsets.bin", "rb") as file:
         table = read_bin_sized(file, pos, size)
         if term not in table:
-            print(term)
-            raise Exception
+            raise Exception(f"{term} not in corpus")
         pos, size = table[term]
     with open("INDEX/index.bin", "rb") as file:
         return read_bin_sized(file, pos, size, format=list[Posting])
@@ -58,7 +57,6 @@ def retrieve(query: str, n: int, timed=False) -> list | tuple[list, float]:
     q_terms.sort(key=lambda term: -idfs[term])
     q_bigrams.sort(key=lambda bigram: -idfs[bigram])
     q_terms.extend(q_bigrams)
-    print(time.time() - start)
 
     # score and prune results on a term-by-term basis
     results = {}

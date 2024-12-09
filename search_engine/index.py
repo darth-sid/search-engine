@@ -9,6 +9,7 @@ if __name__ == "__main__":
     PART_THRESHOLD = 100
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", action="store_true")
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument("--pre", action="store_true")
     group.add_argument("--partial", action="store_true")
@@ -16,9 +17,9 @@ if __name__ == "__main__":
     group.add_argument("--post", action="store_true")
     group.add_argument("--all", action="store_true")
     args = parser.parse_args()
-    
+
     if args.pre:
-        preprocess(SRC, PROCESSED)
+        preprocess(SRC, PROCESSED, debug=args.debug)
         pass
     elif args.partial:
         build_partials(PROCESSED, PARTIAL, PART_THRESHOLD)
@@ -28,6 +29,6 @@ if __name__ == "__main__":
         build_partials(PROCESSED, PARTIAL, PART_THRESHOLD)
         merge_partials(PARTIAL, INDEX)
     else:
-        preprocess(SRC, PROCESSED)
+        preprocess(SRC, PROCESSED, debug=args.debug)
         build_partials(PROCESSED, PARTIAL, PART_THRESHOLD)
         merge_partials(PARTIAL, INDEX)

@@ -5,7 +5,7 @@ from utils.structs import PageData
 from .simhashing import simhash, hamming_distance
 
 
-def preprocess(src_path: str, path: str):
+def preprocess(src_path: str, path: str, debug: bool = False):
     """preprocess corpus from src_path for indexing and save to given path"""
     create_empty_dir(path)
 
@@ -31,7 +31,7 @@ def preprocess(src_path: str, path: str):
             with open(f"{path}/{unique_count}.bin", "wb") as file:
                 page = PageData(url=data["url"], tokens=tokens, bigrams=shingles)
                 write_bin(file, page)
-        if total_count % 1000 == 0:
+        if total_count % 1000 == 0 and debug:
             print(
                 f"{total_count} seen, {unique_count} unique, {total_count-unique_count} deduplicated"
             )

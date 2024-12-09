@@ -11,7 +11,6 @@ if __name__ == "__main__":
     parser.add_argument("--debug", default=True)
     args = parser.parse_args()
     if args.ui:
-        print(args)
         app.run(debug=args.debug, host=args.host, port=args.port)
     else:
         query = input("Search:")

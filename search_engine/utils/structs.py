@@ -6,11 +6,6 @@ class Posting(Struct):
     tfs: dict[str, float]
 
 
-class TermData(Struct):
-    postings: list[Posting]
-    idf: float
-
-
 class PageData(Struct):
     url: str
     tokens: list[tuple[str, str]]

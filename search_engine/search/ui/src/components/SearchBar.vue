@@ -18,11 +18,9 @@ async function search(query: str) {
 async function handleSearch(event) {
     const [new_results, time] = await search(event.target.value)
     retrieval_time.value = Math.trunc(time * 10**4) / 10**4
-    console.log(time)
     results.value = new_results
     curr.value = input.value
     input.value = ""
-    console.log(results_container)
     nextTick(() => {
         results_container.value.scrollTop = 0
     })

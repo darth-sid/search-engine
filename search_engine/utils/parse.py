@@ -1,5 +1,4 @@
 from collections.abc import Iterable, Iterator
-from typing import Any
 from nltk.stem import PorterStemmer
 from bs4 import BeautifulSoup
 import re
@@ -86,20 +85,3 @@ def compute_word_tf(
             tag_tfs[tag] = math.log(frequencies[token][tag] + 1)
         tfs[token] = tag_tfs
     return tfs
-
-
-if __name__ == "__main__":
-    important_tags = ["title", "h1", "h2", "h3", "strong", "b"]
-    content = "<title>titulo</title><div>hi<title>title</title><h1>header</h1><p>breh</p>oh</div>"
-    print(list(tokenize_page(content, important_tags)))
-
-    """important_tokens = []
-    tokens = []
-    for tag_type in ["title", "h1"]:
-        for tag in soup.find_all(tag_type):
-            for token in tokenize(tag.text):
-                important_tokens.append(token)
-            tag.decompose()
-    tokens = list(tokenize(soup.get_text(separator=" ")))
-    print(important_tokens)
-    print(tokens)"""
