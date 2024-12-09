@@ -9,3 +9,9 @@ class Posting(Struct):
 class TermData(Struct):
     postings: list[Posting]
     idf: float
+
+
+class PageData(Struct):
+    url: str
+    tokens: list[tuple[str, str]]
+    bigrams: list[str]

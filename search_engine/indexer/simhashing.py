@@ -16,5 +16,4 @@ def simhash(features: list[str]) -> int:
     sums[sums > 0] = 1
     return int.from_bytes(np.packbits(sums))
 
-def shingle(features: list[str], k: int=1) -> list[str]:
-    return [' '.join(features[i:i+k]) for i in range(len(features)-k+1)]
+

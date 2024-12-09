@@ -15,7 +15,7 @@ def search():
         return "Specify a query", 400
     if n is None:
         n = 5
-    urls = retrieve(query, 5, timed=True)
+    urls = retrieve(query, 10, timed=True)
     return {"time": urls[1], "urls": urls[0]}, 200
 
 

@@ -23,6 +23,7 @@ def merge_partials(partials_path: str, path: str) -> None:
     partials = MultiPartialReader(partials)
 
     offsets = {}
+    idfs = {}
     with open(f"{path}/index.bin", "wb") as index:
         pos = 0
         while partials:
@@ -31,11 +32,13 @@ def merge_partials(partials_path: str, path: str) -> None:
                 entry = partials.pop()
                 postings.extend(entry.postings)
 
+            frag = term[:3]
             df = len(postings)
             idf = log(N / df)
-            data = TermData(postings=postings, idf=idf)
-            size = write_bin(index, data, pos=pos)
-            frag = term[:2]
+            if frag not in idfs:
+                idfs[frag] = {}
+            idfs[frag][term] = idf
+            size = write_bin(index, postings, pos=pos)
             if frag not in offsets:
                 offsets[frag] = {}
             offsets[frag][term] = (pos, size)
@@ -49,8 +52,19 @@ def merge_partials(partials_path: str, path: str) -> None:
             offsets_offsets[frag] = (pos, size)
             pos += size
 
-    with open(f"{path}/offsets0.bin", "wb") as file:
+    with open(f"{path}/offsets_offsets.bin", "wb") as file:
         write_bin(file, offsets_offsets)
+
+    idf_offsets = {}
+    with open(f"{path}/idf.bin", "wb") as file:
+        pos = 0
+        for frag in idfs:
+            size = write_bin(file, idfs[frag])
+            idf_offsets[frag] = (pos, size)
+            pos += size
+
+    with open(f"{path}/idf_offsets.bin", "wb") as file:
+        write_bin(file, idf_offsets)
 
 
 class PartialIndexReadBuffer:
@@ -58,7 +72,7 @@ class PartialIndexReadBuffer:
 
     def __init__(self, path: str, part_id: int | None = None):
         self.id = (
-            int(path.split("_")[-1].rstrip(".bin")) if part_id is None else part_id
+            int(path.split("/")[-1].rstrip(".bin")) if part_id is None else part_id
         )
         self._file = open(path, "rb")
         self._pos = 0

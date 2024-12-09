@@ -16,8 +16,8 @@ if __name__ == "__main__":
     else:
         query = input("Search:")
         start = time.time()
-        results = retrieve(query,5)
+        results = retrieve(query, 10)
         end = time.time()
-        for i,result in enumerate(results):
+        for i, result in enumerate(results):
             print(f"{i+1}. {result}")
         print(f"Time elapsed: {end-start}s")

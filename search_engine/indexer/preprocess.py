@@ -1,7 +1,8 @@
 from utils import create_empty_dir, walk
 from utils.io import read_json, write_bin
-from utils.parse import tokenize_page
-from .simhashing import shingle, simhash, hamming_distance
+from utils.parse import tokenize_page, shingle
+from utils.structs import PageData
+from .simhashing import simhash, hamming_distance
 
 
 def preprocess(src_path: str, path: str):
@@ -28,7 +29,7 @@ def preprocess(src_path: str, path: str):
             unique_count += 1
             hashes.append(h)
             with open(f"{path}/{unique_count}.bin", "wb") as file:
-                page = {"url": data["url"], "tokens": tokens}
+                page = PageData(url=data["url"], tokens=tokens, bigrams=shingles)
                 write_bin(file, page)
         if total_count % 1000 == 0:
             print(

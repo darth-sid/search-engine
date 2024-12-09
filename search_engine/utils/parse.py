@@ -55,6 +55,10 @@ def tokenize(text: str, stem=True) -> Iterator[str]:
         yield token
 
 
+def shingle(features: list[str], k: int = 1) -> list[str]:
+    return [" ".join(features[i : i + k]) for i in range(len(features) - k + 1)]
+
+
 porter = PorterStemmer()
 
 
@@ -63,8 +67,11 @@ def stem_word(word: str) -> str:
     return porter.stem(word)
 
 
-def compute_word_tf(tokens: Iterable[tuple[str, str]]) -> dict[str, dict[str, float]]:
+def compute_word_tf(
+    tokens: Iterable[tuple[str, str] | str],
+) -> dict[str, dict[str, float]]:
     """return a map of tokens to their tf score split by tag (freq of token / total num of words)"""
+    tokens = (((token, "") if isinstance(token, str) else token) for token in tokens)
     frequencies = {}
     for token, tag in tokens:
         if token not in frequencies:
