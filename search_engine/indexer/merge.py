@@ -1,6 +1,6 @@
 from utils import create_empty_dir, copy, walk
 from utils.io import read_bin, read_bin_chunk, write_bin
-from utils.structs import Posting, TermData
+from utils.structs import Posting
 from typing import NamedTuple
 import heapq
 from math import log

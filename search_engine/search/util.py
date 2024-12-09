@@ -1,6 +1,6 @@
 from utils.parse import tokenize, shingle
 from utils.io import read_bin, read_bin_sized
-from utils.structs import Posting, TermData
+from utils.structs import Posting
 import heapq
 import time
 
