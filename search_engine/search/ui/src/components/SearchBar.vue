@@ -36,7 +36,7 @@ async function handleSearch(event) {
                v-model=input
                @keyup.enter=handleSearch
             />
-        <p v-if=results.length class=caption> Search Results for "{{curr}}" ({{retrieval_time}}s)</p>
+        <p v-if="retrieval_time!=0" class=caption>{{!results.length ? 'No' : ''}} Search Results for "{{curr}}" ({{retrieval_time}}s)</p>
     </div>
     <div class=results-container ref="results_container">
         <ul v-if=results.length class=result_list>

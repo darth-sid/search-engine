@@ -14,7 +14,7 @@ def search_term(term: str) -> list[Posting]:
     with open("INDEX/offsets.bin", "rb") as file:
         table = read_bin_sized(file, pos, size)
         if term not in table:
-            raise Exception(f"{term} not in corpus")
+            return []
         pos, size = table[term]
     with open("INDEX/index.bin", "rb") as file:
         return read_bin_sized(file, pos, size, format=list[Posting])
