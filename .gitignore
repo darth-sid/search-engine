@@ -166,7 +166,7 @@ cython_debug/
 *INDEX/
 *PROCESSED/
 .DS_Store
-backup/
+backups/
 ignore/
 report.*
 *test.*
